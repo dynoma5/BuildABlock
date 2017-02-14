@@ -1,39 +1,130 @@
 module Enumerable
 
 def my_each
-total = (self.length)-1
-for i in(0..total)
-
-	yield(self[i])
+for i in self
+	yield(i)
 	end
 end
 
 def my_each_with_index
-total = (self.length)-1
-for i in (0..total)
-
-	yield(self[i],i)
+index = 0
+for i in self
+	yield(i,index)
+	index += 1
 	end
 end
 	
 def my_select
-	total = (self.length)-1
-	for i in (0..total)
-		unless (yield(self[i]))
-		self[i].delete
-		end
+	copy = self.dup
+	for i in self
+	if copy.class == "Array"	
+		copy.delete(i) unless yield i
+	else
+		copy.delete(i[0]) unless yield(i[0],i[1])
+		 end
 	end
+	return copy
 end	
 
+def my_all?
+check = true
+	for i in self
+	
+	if self.class == Array
+		if yield(i) == false
+			check = false
+			break
+		end
+	else
+		if yield(i[0],i[1]) == false
+			check = false
+			break
+		end	
+	end
+	end	
+	return check
+end	
 
+def my_any?
+check = false
+	for i in self
+	
+	if self.class == Array
+		if yield(i)
+			check = true
+			break
+		end
+	else
+		if yield(i[0],i[1])
+			check = true
+			break
+		end
+	end	
+	end
+return check	
+end
+
+def my_none?
+check = true
+	for i in self
+		if self.class == Array
+			if yield(i)
+			check = false
+			break
+			end
+		else
+			if yield(i[0],i[1])
+				check = false
+				break
+			end
+		end	
+	end
+return check	
+end
+
+def my_count
+count = 0
+	for i in self
+		if yield(i)
+			count += 1
+		end
+	end
+return count
+end	
+
+def my_map
+ new = []
+ for i in self
+	result = yield(i)
+	new.push(result)
+end
+return new
 end
 	
-test = [1,2,3,4,5]
-#test.my_each{|x| puts x}
-#test.my_each_with_index{|x,y| puts x,y}
-#test.each_with_index{|x,y| puts x,y}
-test.my_select do|x| 
- puts x >1
-end 
-test.select{|x| x>1 }
+def my_inject(result = 0, sym)
+	
+	for i in self
+		if sym == nil
+			result = yield(result,i)
+		else
+			result = i.send(sym,result)
+		end	
+			
+	end
+return result	
+end
+  
+ 
+end
+ def multiply_els(array)
+	result = array.my_inject(:*)
+	return result
+end	
+#test = [1,2,3,4,5]
+test = {1=> 'a', 2=> 'b', 3=>'c',4=>'d'}
+
+dummy = (5..10).my_inject(:+) 
+puts dummy
+ print multiply_els([2,4,5])
+
 
